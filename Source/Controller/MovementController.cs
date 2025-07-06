@@ -1,42 +1,31 @@
-﻿namespace CustomRoles.Features.Controller
-{
-	using Exiled.API.Features;
+﻿//namespace CustomRoles.Features.Controller
+//{
+//	using System;
 
-	using ProjectMER.Features.Objects;
+//	using Exiled.API.Features;
 
-	using UnityEngine;
+//	using ProjectMER.Features.Objects;
 
-	public class MovementController : MonoBehaviour
-	{
-		public void Init(SchematicObject schematicObject, Speaker speaker, Vector3 offset)
-		{
-			_player = Player.Get(gameObject);
-			_schematicObject = schematicObject;
-			_speaker = speaker;
-			_offset = offset;
+//	using UnityEngine;
 
-			Log.Debug($"[ObjectController] Controller initialized.");
-		}
+//	[Obsolete]
+//	public class MovementController : MonoBehaviour
+//	{
+//		//public void Init(SchematicObject schematicObject, Speaker speaker, Vector3 offset)
+//		//{
+//		//	_player = Player.Get(gameObject);
+//		//	_schematicObject = schematicObject;
+//		//	_speaker = speaker;
+//		//	_offset = offset;
 
-		private void Update()
-		{
-			_schematicObject.transform.position = _player.GameObject.transform.position + _offset;
-			_schematicObject.transform.rotation = _player.GameObject.transform.rotation;
-			_speaker.transform.position = _player.GameObject.transform.position;
-		}
+//		//	Log.Debug($"[ObjectController] Controller initialized.");
+//		//}
 
-		private void OnDestroy()
-		{
-			_schematicObject = null;
-			_player = null;
-			_speaker = null;
-
-			Log.Debug($"[ObjectController] Controller destroyed");
-		}
-
-		private SchematicObject _schematicObject;
-		private Player _player;
-		private Speaker _speaker;
-		private Vector3 _offset;
-	}
-}
+//		private void Update()
+//		{
+//			transform.position = _player.GameObject.transform.position + _offset;
+//			transform.rotation = _player.GameObject.transform.rotation;
+//			transform.position = _player.GameObject.transform.position;
+//		}
+//	}
+//}

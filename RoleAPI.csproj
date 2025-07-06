@@ -33,16 +33,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Source\Abilities\AnimationAbility.cs" />
-    <Compile Include="Source\Abilities\HealAbility.cs" />
-    <Compile Include="Source\Abilities\HelloAbility.cs" />
-    <Compile Include="Source\Abilities\YippeeAbility.cs" />
-    <Compile Include="Source\Config.cs" />
     <Compile Include="Source\Controller\CooldownController.cs" />
     <Compile Include="Source\Controller\MovementController.cs" />
     <Compile Include="Source\Controller\PlayerController2.cs" />
-    <Compile Include="Source\CustomRole2.cs" />
-    <Compile Include="Source\EventHandler.cs" />
+    <Compile Include="Source\ExtendedRole.cs" />
     <Compile Include="Source\Interfaces\Ability.cs" />
     <Compile Include="Source\Interfaces\IAbility.cs" />
     <Compile Include="Source\Managers\AbilityRegistrator.cs" />
@@ -52,8 +46,6 @@
     <Compile Include="Source\Managers\KeybindManager.cs" />
     <Compile Include="Source\Managers\SchematicManager.cs" />
     <Compile Include="Source\Patches\SchematicMerPatch.cs" />
-    <Compile Include="Source\Plugin.cs" />
-    <Compile Include="Source\Scp999Role.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ExMod.Exiled">
@@ -61,21 +53,21 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-	<Reference Include="System" />
+    <Reference Include="System" />
     <Reference Include="0Harmony">
-      <HintPath>References\0Harmony.dll</HintPath>
+      <HintPath>$(SL_REFERENCES)\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="AudioPlayerApi">
-      <HintPath>References\AudioPlayerApi.dll</HintPath>
+      <HintPath>$(SL_REFERENCES)\AudioPlayerApi.dll</HintPath>
     </Reference>
     <Reference Include="HintServiceMeow-Exiled">
-      <HintPath>References\HintServiceMeow-Exiled.dll</HintPath>
+      <HintPath>$(SL_REFERENCES)\HintServiceMeow-Exiled.dll</HintPath>
     </Reference>
     <Reference Include="NVorbis">
-      <HintPath>References\NVorbis.dll</HintPath>
+      <HintPath>$(SL_REFERENCES)\NVorbis.dll</HintPath>
     </Reference>
     <Reference Include="ProjectMER">
-      <HintPath>References\ProjectMER.dll</HintPath>
+      <HintPath>$(SL_REFERENCES)\ProjectMER.dll</HintPath>
     </Reference>
     <Reference Include="Mirror">
       <HintPath>$(SL_REFERENCES)\Mirror.dll</HintPath>

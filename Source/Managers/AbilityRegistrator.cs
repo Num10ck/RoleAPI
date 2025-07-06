@@ -4,12 +4,14 @@
 	using System.Collections.Generic;
 	using System.Reflection;
 
-	using Exiled.API.Features;
-
 	using CustomRoles.Interfaces;
+
+	using Exiled.API.Features;
 
 	public static class AbilityRegistrator
 	{
+		public static IReadOnlyList<IAbility> GetAbilities => _abilityList;
+
 		private readonly static List<IAbility> _abilityList = [];
 		public static void RegisterAbilities()
 		{
@@ -18,12 +20,12 @@
 				if (type.IsInterface || type.IsAbstract || !type.GetInterfaces().Contains(typeof(IAbility)))
 					continue;
 
-				IAbility activator = Activator.CreateInstance(type) as IAbility;
-				if (activator != null)
+				if (Activator.CreateInstance(type) is IAbility activator)
 				{
 					_abilityList.Add(activator);
 
 					Log.Debug($"Register the {activator.Name} ability.");
+
 					activator.Register();
 				}
 			}
@@ -36,7 +38,5 @@
 				ability.Unregister();
 			}
 		}
-
-		public static List<IAbility> GetAbilities => _abilityList;
 	}
 }

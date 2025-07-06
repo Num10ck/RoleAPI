@@ -35,7 +35,7 @@ bld/
 [Ll]ogs/
 
 # References
-[Rr]eferences/
+[Rr]eferences/*
 
 # Build results on 'Bin' directories
 **/[Bb]in/*

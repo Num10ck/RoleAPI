@@ -2,21 +2,26 @@
 {
 	using System.Collections.Generic;
 
-	using Exiled.API.Features;
-	using Exiled.API.Features.Core.UserSettings;
-
-	using ProjectMER.Features.Objects;
-
-	using CustomRoles.Features.Controller;
-
 	using CustomRoles.Features.Managers;
 	using CustomRoles.Interfaces;
 
-	using UnityEngine;
+	using Exiled.API.Features;
+	using Exiled.API.Features.Core.UserSettings;
 	using Exiled.CustomRoles.API.Features;
 
-	public abstract class CustomRole2 : CustomRole
+	using ProjectMER.Features.Objects;
+
+	using UnityEngine;
+
+	public abstract class ExtendedRole : CustomRole
 	{
+		public static IReadOnlyDictionary<Player, ExtendedRole> Instances
+		{
+			get => _instances;
+		}
+
+		private readonly static Dictionary<Player, ExtendedRole> _instances = [];
+
 		public SchematicObject Schematic { get; set; }
 
 		public AudioPlayer Audio { get; set; }
@@ -25,7 +30,15 @@
 
 		public Speaker Speaker { get; set; }
 
-		protected MovementController MovementController { get; set; }
+		public override void AddRole(Player player)
+		{
+			_instances.Add(player, this);
+		}
+
+		public override void RemoveRole(Player player)
+		{
+			_instances.Remove(player);
+		}
 
 		public void Create(
 			Player player,
@@ -43,12 +56,12 @@
 
 		public static void Create(
 			Player player,
-			CustomRole2 role,
+			ExtendedRole role,
 			SchematicObject schematic,
 			IEnumerable<IAbility> abilities,
 			int volume = 100)
 		{
-			role.Audio = AudioExtensions.AddAudioPlayer(player, volume);
+			role.Audio = AudioExtensions.AddAudio(player, volume);
 
 			if (!role.Audio.TryGetSpeaker("scp999-speaker", out Speaker speaker))
 			{
@@ -70,18 +83,13 @@
 			HintExtensions.AddHint(player);
 			InvisibilityExtensions.MakeInvisible(player);
 
-			role.MovementController = player.GameObject.AddComponent<MovementController>();
-
-			role.MovementController.Init(
-				role.Schematic,
-				role.Speaker,
-				role.Schematic.transform.localPosition);
+			// NOTE: Local position excluded.
+			role.Schematic.transform.SetParent(player.Transform);
+			role.Speaker.transform.SetParent(role.Schematic.transform);
 		}
 
-		public static void Destroy(Player player, CustomRole2 role)
+		public static void Destroy(Player player, ExtendedRole role)
 		{
-			GameObject.Destroy(role.MovementController);
-
 			InvisibilityExtensions.RemoveInvisibility(player);
 			KeybindManager.UnregisterKeybindsForPlayer(player);
 			HintExtensions.RemoveHint(player);

@@ -1,26 +1,12 @@
 ﻿namespace CustomRoles.Features.Managers
 {
-	using System.Collections.Generic;
 	using System.IO;
 
 	using Exiled.API.Features;
 
 	public static class AudioExtensions
 	{
-		private static List<string> _audioNameList = new()
-		{
-			"yippee-tbh1",
-			"yippee-tbh2",
-			"hello",
-			"hi",
-			"jump",
-			"health",
-			"circus",
-			"funnytoy",
-			"uwu"
-		};
-
-		public static AudioPlayer AddAudioPlayer(this Player player, int volume)
+		public static AudioPlayer AddAudio(this Player player, int volume)
 		{
 			AudioPlayer audioPlayer = AudioPlayer.CreateOrGet($"Scp999 {player.Nickname}", onIntialCreation: (p) =>
 			{
@@ -34,27 +20,23 @@
 			return audioPlayer;
 		}
 
-		private static void LoadAudioFiles()
+		public static void LoadAudioFiles(string path)
 		{
-			string path = Plugin.Singleton.AudioPath;
-
-			foreach (string audioName in _audioNameList)
+			if (!Directory.Exists(path))
 			{
-				if (!AudioClipStorage.AudioClips.ContainsKey(audioName))
-				{
-					string filePath = Path.Combine(path, audioName) + ".ogg";
+				Log.Error($"Directory \"{path}\" isn't exist.");
+			}
 
-					if (!AudioClipStorage.LoadClip(filePath, audioName))
+			foreach (string name in Directory.EnumerateFiles(path))
+			{
+				if (!AudioClipStorage.AudioClips.ContainsKey(name) && name.EndsWith(".ogg"))
+				{
+					if (!AudioClipStorage.LoadClip(name))
 					{
-						Log.Error($"[AddAudioPlayer] The audio file {audioName} was not found for playback");
+						Log.Error($"[{nameof(LoadAudioFiles)}] The audio file {name} was not found for playback.");
 					}
 				}
 			}
-		}
-
-		static AudioExtensions()
-		{
-			LoadAudioFiles();
 		}
 	}
 }

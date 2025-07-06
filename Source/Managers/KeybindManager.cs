@@ -2,10 +2,10 @@
 {
 	using System.Collections.Generic;
 
+	using CustomRoles.Interfaces;
+
 	using Exiled.API.Features;
 	using Exiled.API.Features.Core.UserSettings;
-
-	using CustomRoles.Interfaces;
 
 	public static class KeybindManager
 	{

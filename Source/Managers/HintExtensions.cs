@@ -1,16 +1,15 @@
 ﻿namespace CustomRoles.Features.Managers
 {
-	using System;
 	using System.Linq;
 	using System.Text;
+
+	using CustomRoles.Features.Controller;
+	using CustomRoles.Interfaces;
 
 	using Exiled.API.Features;
 
 	using HintServiceMeow.Core.Enum;
 	using HintServiceMeow.Core.Utilities;
-
-	using CustomRoles.Features.Controller;
-	using CustomRoles.Interfaces;
 
 	using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 

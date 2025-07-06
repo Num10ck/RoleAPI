@@ -1,7 +1,5 @@
 ﻿namespace CustomRoles.Features.Managers
 {
-	using System;
-
 	using Exiled.API.Features;
 
 	using ProjectMER.Features;
@@ -14,9 +12,9 @@
 		public static SchematicObject AddSchematicByName(string schematicName)
 		{
 			return ObjectSpawner.SpawnSchematic(
-				schematicName, 
-				Vector3.zero, 
-				Vector3.zero, 
+				schematicName,
+				Vector3.zero,
+				Vector3.zero,
 				Vector3.one
 			);
 		}
