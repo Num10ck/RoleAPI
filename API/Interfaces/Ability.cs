@@ -1,6 +1,6 @@
-﻿namespace CustomRoles.Interfaces
+﻿namespace RoleAPI.API.Interfaces
 {
-	using CustomRoles.Features.Controller;
+	using Controller;
 
 	using Exiled.API.Features;
 

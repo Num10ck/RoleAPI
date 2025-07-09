@@ -1,18 +1,18 @@
-﻿namespace CustomRoles.Features.Managers
+﻿namespace RoleAPI.API.Managers
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Reflection;
 
-	using CustomRoles.Interfaces;
-
 	using Exiled.API.Features;
+
+	using Interfaces;
 
 	public static class AbilityRegistrator
 	{
 		public static IReadOnlyList<IAbility> GetAbilities => _abilityList;
 
-		private readonly static List<IAbility> _abilityList = [];
+		private static readonly List<IAbility> _abilityList = [];
 		public static void RegisterAbilities()
 		{
 			foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())

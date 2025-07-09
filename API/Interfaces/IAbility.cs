@@ -1,4 +1,4 @@
-﻿namespace CustomRoles.Interfaces
+﻿namespace RoleAPI.API.Interfaces
 {
 	using UnityEngine;
 

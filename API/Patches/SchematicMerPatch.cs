@@ -1,7 +1,7 @@
 ﻿#define DEBUG
 
 #if DEBUG
-namespace CustomRoles.Patches
+namespace RoleAPI.API.Patches
 {
 	using System.Diagnostics;
 

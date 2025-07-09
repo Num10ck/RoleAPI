@@ -1,15 +1,15 @@
-﻿namespace CustomRoles.Features.Managers
+﻿namespace RoleAPI.API.Managers
 {
 	using System.Collections.Generic;
-
-	using CustomRoles.Interfaces;
 
 	using Exiled.API.Features;
 	using Exiled.API.Features.Core.UserSettings;
 
+	using Interfaces;
+
 	public static class KeybindManager
 	{
-		private readonly static Dictionary<Player, List<SettingBase>> _settings;
+		private static readonly Dictionary<Player, List<SettingBase>> _settings;
 
 		public static void RegisterKeybindsForPlayer(
 			Player player,

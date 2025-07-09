@@ -1,4 +1,4 @@
-﻿namespace CustomRoles.Features.Managers
+﻿namespace RoleAPI.API.Managers
 {
 	using Exiled.API.Features;
 

@@ -1,11 +1,11 @@
-﻿namespace CustomRoles.Features.Controller
+﻿namespace RoleAPI.API.Controller
 {
 	using System.Collections.Generic;
 	using System.Linq;
 
-	using CustomRoles.Features.Managers;
-
 	using Exiled.API.Features;
+
+	using RoleAPI.API.Managers;
 
 	using UnityEngine;
 
