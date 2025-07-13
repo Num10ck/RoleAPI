@@ -2,23 +2,24 @@
 {
 	using System.Collections.Generic;
 
-	using Exiled.API.Features;
 	using Exiled.API.Features.Core.UserSettings;
 
 	using Interfaces;
 
 	public static class KeybindManager
 	{
-		private static readonly Dictionary<Player, List<SettingBase>> _settings;
-
-		public static void RegisterKeybindsForPlayer(
-			Player player,
-			HeaderSetting header,
-			IEnumerable<IAbility> abilities)
+		private static IEnumerable<SettingBase> _settings;
+		public static void RegisterKeybinds(IEnumerable<IAbility> abilities, string pluginName)
 		{
-			List<SettingBase> settings = [header];
-
-			_settings.Add(player, []);
+			List<SettingBase> settings = new();
+			
+			var header = new HeaderSetting(
+				name: $"Abilities of {pluginName}",
+				hintDescription: $"Abilities of {pluginName}",
+				paddling: true
+			);
+			
+			settings.Add(header);
 
 			foreach (IAbility ability in abilities)
 			{
@@ -31,20 +32,18 @@
 					ability.Description
 				);
 
-				_settings[player].Add(setting);
+				settings.Add(setting);
 			}
 
-			SettingBase.Register(player, settings);
+			_settings = settings;
+        
+			SettingBase.Register(_settings);
+			SettingBase.SendToAll();
 		}
 
-		public static void UnregisterKeybindsForPlayer(Player player)
+		public static void UnregisterKeybinds()
 		{
-			SettingBase.Unregister(player, _settings[player]);
-		}
-
-		static KeybindManager()
-		{
-			_settings = [];
+			SettingBase.Unregister(settings: _settings);
 		}
 	}
 }

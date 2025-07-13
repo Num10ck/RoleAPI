@@ -6,7 +6,6 @@
 
 	using Exiled.API.Enums;
 	using Exiled.API.Features;
-	using Exiled.API.Features.Core.UserSettings;
 	using Exiled.CustomRoles.API.Features;
 
 	using Interfaces;
@@ -109,12 +108,6 @@
 
 			role.Animator = SchematicManager.GetAnimatorFromSchematic(schematic);
 
-			HeaderSetting setting = new(
-				"Custom role",
-				"Abilities"
-			);
-
-			KeybindManager.RegisterKeybindsForPlayer(player, setting, abilities);
 			//role.HintController = GameObject.AddComponent<HintController>();
 			//role.HintController.Init(player);
 
@@ -125,7 +118,6 @@
 
 		private static void Destroy(Player player, ExtendedRole role)
 		{
-			KeybindManager.UnregisterKeybindsForPlayer(player);
 			//GameObject.Destroy(role.HintController);
 
 			role.AudioPlayer.RemoveAllClips();
