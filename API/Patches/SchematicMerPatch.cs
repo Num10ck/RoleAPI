@@ -1,17 +1,14 @@
-﻿#define DEBUG
-
-#if DEBUG
-namespace RoleAPI.API.Patches
+﻿namespace RoleAPI.API.Patches
 {
 	using System.Diagnostics;
+
+	using Exiled.API.Features;
 
 	using HarmonyLib;
 
 	[HarmonyPatch(typeof(ProjectMER.ProjectMER), nameof(ProjectMER.ProjectMER.SchematicsDir), MethodType.Getter)]
 	internal class SchematicMerPatch
 	{
-		public const string SCHEMATIC_PATH = "Schematics";
-
 		public static bool Prefix(ref string __result)
 		{
 			var stackTrace = new StackTrace();
@@ -20,9 +17,10 @@ namespace RoleAPI.API.Patches
 				var declaringType = frame.GetMethod().DeclaringType;
 				var assemblyName = declaringType.Assembly.GetName().Name;
 
-				if (assemblyName == "Scp999" && declaringType.Name == "SchematicManager")
+				if (assemblyName == "RoleAPI" && declaringType.Name == "SchematicManager")
 				{
-					__result = SCHEMATIC_PATH;
+					Log.Debug($"Get schematic from {Startup.SchematicPath}");
+					__result = Startup.SchematicPath;
 					return false;
 				}
 			}
@@ -31,5 +29,3 @@ namespace RoleAPI.API.Patches
 		}
 	}
 }
-
-#endif

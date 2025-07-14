@@ -21,6 +21,7 @@
 	public abstract class ExtendedRole : CustomRole
 	{
 		public abstract List<EffectType> EffectList { get; set; }
+		public abstract string SchematicName { get; set; }
 		
 		public static IReadOnlyDictionary<Player, ExtendedRole> Instances
 		{

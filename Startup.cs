@@ -6,20 +6,29 @@ namespace RoleAPI
 
 	using HarmonyLib;
 
-	public class Startup
+	public static class Startup
 	{
-		public static void SetupAPI(string pluginName)
+		public static string AssemblyName;
+		public static string SchematicPath;
+		public static string AudioPath;
+		public static void SetupAPI(string pluginName, string assemblyName)
 		{
+			AssemblyName = assemblyName;
+			
 			// Patch
 			var harmony = new Harmony($"risottoman.{pluginName}");
 			harmony.PatchAll();
-		
+			
+			// Path
 			string basePath = Path.Combine(Paths.IndividualConfigs, pluginName.ToLower());
-			CreatePluginDirectory(Path.Combine(basePath, "Schematics"));
-			CreatePluginDirectory(Path.Combine(basePath, "Audio"));
+			SchematicPath = Path.Combine(basePath, "Schematics");
+			AudioPath = Path.Combine(basePath, "Audio");
+			CreatePluginDirectory(SchematicPath);
+			CreatePluginDirectory(AudioPath);
 		
 			// Register the abilities
 			API.Managers.AbilityRegistrator.RegisterAbilities();
+
 			API.Managers.KeybindManager.RegisterKeybinds(
 				API.Managers.AbilityRegistrator.GetAbilities,
 				pluginName
