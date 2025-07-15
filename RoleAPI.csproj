@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /Y $(TargetPath) &quot;$(SL_REFERENCES)\&quot;" />
+  </Target>
   <ItemGroup>
     <Compile Include="API\Controller\HintController.cs" />
     <Compile Include="API\Managers\TextToyManager.cs" />
