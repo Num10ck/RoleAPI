@@ -1,31 +1,26 @@
-﻿//namespace CustomRoles.Features.Controller
-//{
-//	using System;
+﻿namespace RoleAPI.API.Controller
+{
+	using Exiled.API.Features;
 
-//	using Exiled.API.Features;
+	using UnityEngine;
 
-//	using ProjectMER.Features.Objects;
+	public class MovementController : MonoBehaviour
+	{
+		private Player _player;
+		private Vector3 _offset;
+		
+		public void Init(Player player, Vector3 offset)
+		{
+			_player = player;
+			_offset = offset;
 
-//	using UnityEngine;
+			Log.Debug("[MovementController] Controller initialized.");
+		}
 
-//	[Obsolete]
-//	public class MovementController : MonoBehaviour
-//	{
-//		//public void Init(SchematicObject schematicObject, Speaker speaker, Vector3 offset)
-//		//{
-//		//	_player = Player.Get(gameObject);
-//		//	_schematicObject = schematicObject;
-//		//	_speaker = speaker;
-//		//	_offset = offset;
-
-//		//	Log.Debug($"[ObjectController] Controller initialized.");
-//		//}
-
-//		private void Update()
-//		{
-//			transform.position = _player.GameObject.transform.position + _offset;
-//			transform.rotation = _player.GameObject.transform.rotation;
-//			transform.position = _player.GameObject.transform.position;
-//		}
-//	}
-//}
+		private void Update()
+		{
+			transform.position = _player.GameObject.transform.position + _offset;
+			transform.rotation = _player.GameObject.transform.rotation;
+		}
+	}
+}
