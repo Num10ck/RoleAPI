@@ -12,18 +12,23 @@ namespace RoleAPI.API.Controller
 
 	public class HintController : MonoBehaviour
 	{
-		public void Init(Player player)
+		private Player _player;
+		private List<IAbility> _abilities;
+		private CooldownController _controller;
+		
+		public void Awake()
 		{
-			_player = player;
+			_player = Player.Get(gameObject);
+			_controller = gameObject.GetComponent<CooldownController>();
 			_abilities = Managers.AbilityRegistrator.GetAbilities.OrderBy(r => r.KeyId).ToList();
-			_controller = player.GameObject.GetComponent<CooldownController>();
+			
 			InvokeRepeating(nameof(CheckHint), 0f, 0.5f);
 			Log.Debug($"[CooldownController] Invoke the hint cycle");
 		}
     
 		void CheckHint()
 		{
-			StringBuilder stringBuilder = new StringBuilder();
+			StringBuilder stringBuilder = new();
 			stringBuilder.Append("<align=right>");
 			stringBuilder.Append("<size=50><color=#ffa500>\ud83d\ude06 <b>SCP-999</b></color></size>\n");
 			stringBuilder.Append("Abilities:\n");
@@ -49,9 +54,5 @@ namespace RoleAPI.API.Controller
 			CancelInvoke(nameof(CheckHint));
 			Log.Debug($"[CooldownController] Cancel the hint cycle");
 		}
-
-		private Player _player;
-		private List<IAbility> _abilities;
-		private CooldownController _controller;
 	}
 }
