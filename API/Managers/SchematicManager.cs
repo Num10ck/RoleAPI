@@ -1,7 +1,5 @@
 ﻿namespace RoleAPI.API.Managers
 {
-	using Exiled.API.Features;
-
 	using ProjectMER.Features;
 	using ProjectMER.Features.Objects;
 
@@ -21,13 +19,7 @@
 
 		public static Animator GetAnimatorFromSchematic(SchematicObject schematicObject)
 		{
-			Animator animator = schematicObject?.GetComponentInChildren<Animator>(true);
-			if (animator == null)
-			{
-				Log.Error("The animator was not found");
-			}
-
-			return animator;
+			return schematicObject?.GetComponentInChildren<Animator>(true);
 		}
 	}
 }

@@ -8,10 +8,13 @@ namespace RoleAPI.API.Managers
 
 	public static class TextToyManager
 	{
-		public static TextToy CreateTextForSchematic(SchematicObject schematicObject, string pluginName)
+		public static TextToy CreateTextForSchematic(
+			SchematicObject schematicObject, 
+			string pluginName, 
+			string color)
 		{
 			TextToy textToyObject = TextToy.Create(Vector3.zero, Quaternion.identity, Vector3.one, null, false);
-			textToyObject.TextFormat = pluginName;
+			textToyObject.TextFormat = $"<color={color}>{pluginName}</color>";
 			textToyObject.Parent = schematicObject.transform;
 			textToyObject.Transform.localPosition += new Vector3(0, 1, 0);
 			textToyObject.Transform.localRotation = Quaternion.Euler(0f, 180f, 0f);

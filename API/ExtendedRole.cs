@@ -8,9 +8,11 @@
 	using Exiled.API.Features;
 	using Exiled.CustomRoles.API.Features;
 
-	using Interfaces;
+	using LabApi.Features.Wrappers;
 
 	using Managers;
+
+	using MEC;
 
 	using PlayerRoles;
 
@@ -18,27 +20,48 @@
 
 	using UnityEngine;
 
+	using YamlDotNet.Serialization;
+
+	using Player = Exiled.API.Features.Player;
+
 	public abstract class ExtendedRole : CustomRole
 	{
-		public abstract List<EffectType> EffectList { get; set; }
-		public abstract string SchematicName { get; set; }
-		
 		public static IReadOnlyDictionary<Player, ExtendedRole> Instances
 		{
 			get => _instances;
 		}
-
+		
 		private static readonly Dictionary<Player, ExtendedRole> _instances = [];
+		
+		public abstract string SchematicName { get; set; }
 
-		public SchematicObject Schematic { get; set; }
+		public abstract Vector3 SchematicOffset { get; set; }
+		
+		public abstract string TextToyColor { get; set; }
+		
+		public abstract int Volume { get; set; }
+		
+		public abstract bool IsPlayerInvisible { get; set; }
+		
+		public abstract List<EffectType> EffectList { get; set; }
+		
+		[YamlIgnore]
+		private SchematicObject SchematicObject { get; set; }
 
+		[YamlIgnore]
 		public AudioPlayer AudioPlayer { get; set; }
-
+		
+		[YamlIgnore]
 		public Animator Animator { get; set; }
 
+		[YamlIgnore]
 		public Speaker Speaker { get; set; }
 		
-		public HintController HintController { get; set; }
+		[YamlIgnore]
+		private TextToy TextToy { get; set; }
+		
+		[YamlIgnore]
+		private HintController HintController { get; set; }
 
 		public override void AddRole(Player player)
 		{
@@ -55,7 +78,7 @@
 			player.CustomName = this.Name;
 			player.CustomInfo = player.CustomName + "\n" + this.CustomInfo;
 			
-			foreach (EffectType effectType in this.EffectList) //todo add intensity
+			foreach (EffectType effectType in this.EffectList) //TODO add intensity
 			{
 				player.EnableEffect(effectType);
 			}
@@ -66,65 +89,82 @@
 			player.SendConsoleMessage(this.ConsoleMessage, "green");
 			
 			_instances.Add(player, this);
+			
+			this.CreateObjects(player);
 		}
 
 		public override void RemoveRole(Player player)
 		{
-			base.RemoveRole(player);
+			this.DestroyObjects();
+			
 			player.CustomName = null;
 			_instances.Remove(player);
+			
+			base.RemoveRole(player);
 		}
 
-		public void Create(
-			Player player,
-			SchematicObject schematic,
-			IEnumerable<IAbility> abilities,
-			int volume = 100)
+		private void CreateObjects(Player player)
 		{
-			Create(player, this, schematic, abilities, volume);
-		}
-
-		public void Destroy(Player player)
-		{
-			Destroy(player, this);
-		}
-
-		public static void Create(
-			Player player,
-			ExtendedRole role,
-			SchematicObject schematic,
-			IEnumerable<IAbility> abilities,
-			int volume = 100)
-		{
-			role.AudioPlayer = player.AddAudio(volume);
-
-			if (!role.AudioPlayer.TryGetSpeaker("scp999-speaker", out Speaker speaker))
+			// Create SchematicObject from SchematicName
+			this.SchematicObject = SchematicManager.AddSchematicByName(this.SchematicName);
+			if (this.SchematicObject is null)
 			{
-				Log.Error("Failed to get Speaker from custom role.");
-
+				Log.Error("Failed to create Schematic for custom role.");
 				return;
 			}
 			
-			role.Speaker = speaker;
+			// Create AudioPlayer for player
+			this.AudioPlayer = player.AddAudio(this.Volume);
+			if (!this.AudioPlayer.TryGetSpeaker("scp999-speaker", out Speaker speaker)) //TODO
+			{
+				Log.Error("Failed to get Speaker from custom role.");
+				return;
+			}
+			
+			this.Speaker = speaker;
+			
+			// Create TextToy and attach to the SchematicObject
+			this.TextToy = TextToyManager.CreateTextForSchematic(this.SchematicObject, this.Name, this.TextToyColor);
+			if (this.TextToy is null)
+			{
+				Log.Error("Failed to create TextToy for custom role.");
+			}
+			
+			// Get Animator from SchematicObject
+			this.Animator = SchematicManager.GetAnimatorFromSchematic(this.SchematicObject);
+			if (this.Animator is null)
+			{
+				Log.Error("Failed to get Animator from custom role.");
+			}
+			
+			// Attach objects to the SchematicObject
+			this.Speaker.transform.SetParent(this.SchematicObject.transform);
 
-			role.Animator = SchematicManager.GetAnimatorFromSchematic(schematic);
-
-			//role.HintController = GameObject.AddComponent<HintController>();
-			//role.HintController.Init(player);
-
-			// NOTE: Local position excluded.
-			role.Schematic.transform.SetParent(player.Transform);
-			role.Speaker.transform.SetParent(role.Schematic.transform);
+			if (this.IsPlayerInvisible is true)
+			{
+				this.SchematicObject.gameObject.AddComponent<MovementController>().
+					Init(player, this.SchematicOffset);
+			}
+			else
+			{
+				this.SchematicObject.transform.SetParent(player.Transform);
+			}
+			
+			// Attach HintController to the player
+			Timing.CallDelayed(0.1f, () =>
+			{
+				this.HintController = player.GameObject.AddComponent<HintController>();
+			});
 		}
 
-		private static void Destroy(Player player, ExtendedRole role)
+		private void DestroyObjects()
 		{
-			//GameObject.Destroy(role.HintController);
+			//Destroy(this.HintController);
+			
+			this.AudioPlayer.RemoveAllClips();
+			this.AudioPlayer.Destroy();
 
-			role.AudioPlayer.RemoveAllClips();
-			role.AudioPlayer.Destroy();
-
-			role.Schematic.Destroy();
+			this.SchematicObject.Destroy();
 		}
 	}
 }
