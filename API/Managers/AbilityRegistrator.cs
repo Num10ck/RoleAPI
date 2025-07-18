@@ -15,7 +15,7 @@
 		private static readonly List<IAbility> _abilityList = [];
 		public static void RegisterAbilities()
 		{
-			foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
+			foreach (Type type in Assembly.GetCallingAssembly().GetTypes())
 			{
 				if (type.IsInterface || type.IsAbstract || !type.GetInterfaces().Contains(typeof(IAbility)))
 					continue;

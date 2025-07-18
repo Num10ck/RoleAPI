@@ -25,7 +25,7 @@
 			{
 				KeybindSetting setting = new(
 					ability.KeyId,
-					ability.Name,
+					$"{ability.Name} - {ability.Description}",
 					ability.KeyCode,
 					false,
 					false,
