@@ -1,5 +1,7 @@
 ﻿namespace RoleAPI.API.Managers
 {
+	using Configs;
+
 	using ProjectMER.Features;
 	using ProjectMER.Features.Objects;
 
@@ -7,13 +9,13 @@
 
 	public static class SchematicManager
 	{
-		public static SchematicObject AddSchematicByName(string schematicName)
+		public static SchematicObject SpawnSchematic(SchematicConfig config)
 		{
 			return ObjectSpawner.SpawnSchematic(
-				schematicName,
+				config.SchematicName,
 				Vector3.zero,
-				Vector3.zero,
-				Vector3.one
+				config.Rotation,
+				config.Scale
 			);
 		}
 

@@ -35,8 +35,13 @@
     <Exec Command="copy /Y $(TargetPath) &quot;$(SL_REFERENCES)\&quot;" />
   </Target>
   <ItemGroup>
+    <Compile Include="API\Configs\AudioConfig.cs" />
     <Compile Include="API\Controller\HintController.cs" />
     <Compile Include="API\Managers\TextToyManager.cs" />
+    <Compile Include="API\Configs\EffectConfig.cs" />
+    <Compile Include="API\Configs\HintConfig.cs" />
+    <Compile Include="API\Configs\SchematicConfig.cs" />
+    <Compile Include="API\Configs\TextToyConfig.cs" />
     <Compile Include="EventHandler.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

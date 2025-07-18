@@ -2,19 +2,26 @@
 {
 	using System.IO;
 
+	using Configs;
+
 	using Exiled.API.Features;
 
 	public static class AudioExtensions
 	{
-		public static AudioPlayer AddAudio(this Player player, int volume)
+		public static AudioPlayer AddAudio(this Player player, AudioConfig config)
 		{
-			AudioPlayer audioPlayer = AudioPlayer.CreateOrGet($"Scp999 {player.Nickname}", onIntialCreation: (p) =>
+			AudioPlayer audioPlayer = AudioPlayer.CreateOrGet($"{config.Name} {player.Nickname}", onIntialCreation: (p) =>
 			{
 				// Attach created audio player to player.
 				p.transform.parent = player.GameObject.transform;
 
 				// This created speaker will be in 3D space.
-				Speaker speaker = p.AddSpeaker("scp999-speaker", volume, true, 5f, 15f);
+				p.AddSpeaker(
+					$"{config.Name}-speaker", 
+					config.Volume, 
+					config.IsSpatial, 
+					config.MinDistance, 
+					config.MaxDistance);
 			});
 
 			return audioPlayer;
@@ -33,7 +40,7 @@
 				{
 					if (!AudioClipStorage.LoadClip(name))
 					{
-						Log.Error($"[{nameof(LoadAudioFiles)}] The audio file {name} was not found for playback.");
+						Log.Error($"[LoadAudioFiles] The audio file {name} was not found for playback.");
 					}
 				}
 			}

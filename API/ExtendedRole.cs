@@ -2,6 +2,8 @@
 {
 	using System.Collections.Generic;
 
+	using Configs;
+
 	using Controller;
 
 	using Exiled.API.Enums;
@@ -33,17 +35,17 @@
 		
 		private static readonly Dictionary<Player, ExtendedRole> _instances = [];
 		
-		public abstract string SchematicName { get; set; }
-
-		public abstract Vector3 SchematicOffset { get; set; }
+		public abstract SchematicConfig SchematicConfig { get; set; }
 		
-		public abstract string TextToyColor { get; set; }
+		public abstract TextToyConfig TextToyConfig { get; set; }
 		
-		public abstract int Volume { get; set; }
+		public abstract HintConfig HintConfig { get; set; }
+		
+		public abstract AudioConfig AudioConfig { get; set; }
+		
+		public abstract List<EffectConfig> Effects { get; set; }
 		
 		public abstract bool IsPlayerInvisible { get; set; }
-		
-		public abstract List<EffectType> EffectList { get; set; }
 		
 		[YamlIgnore]
 		private SchematicObject SchematicObject { get; set; }
@@ -78,9 +80,12 @@
 			player.CustomName = this.Name;
 			player.CustomInfo = player.CustomName + "\n" + this.CustomInfo;
 			
-			foreach (EffectType effectType in this.EffectList) //TODO add intensity
+			foreach (EffectConfig effect in this.Effects)
 			{
-				player.EnableEffect(effectType);
+				player.EnableEffect(
+					type: effect.EffectType,
+					intensity: effect.Intensity
+				);
 			}
 			
 			this.ShowMessage(player);
@@ -106,7 +111,7 @@
 		private void CreateObjects(Player player)
 		{
 			// Create SchematicObject from SchematicName
-			this.SchematicObject = SchematicManager.AddSchematicByName(this.SchematicName);
+			this.SchematicObject = SchematicManager.SpawnSchematic(this.SchematicConfig);
 			if (this.SchematicObject is null)
 			{
 				Log.Error("Failed to create Schematic for custom role.");
@@ -114,20 +119,28 @@
 			}
 			
 			// Create AudioPlayer for player
-			this.AudioPlayer = player.AddAudio(this.Volume);
-			if (!this.AudioPlayer.TryGetSpeaker("scp999-speaker", out Speaker speaker)) //TODO
+			if (this.AudioConfig.Volume > 0)
 			{
-				Log.Error("Failed to get Speaker from custom role.");
-				return;
+				this.AudioPlayer = player.AddAudio(this.AudioConfig);
+				if (!this.AudioPlayer.TryGetSpeaker($"{this.AudioConfig.Name}-speaker", out Speaker speaker))
+				{
+					Log.Error("Failed to get Speaker from custom role.");
+					return;
+				}
+				
+				// Attach speaker to schematic
+				this.Speaker = speaker;
+				this.Speaker.transform.SetParent(this.SchematicObject.transform);
 			}
 			
-			this.Speaker = speaker;
-			
 			// Create TextToy and attach to the SchematicObject
-			this.TextToy = TextToyManager.CreateTextForSchematic(this.SchematicObject, this.Name, this.TextToyColor);
-			if (this.TextToy is null)
+			if (this.TextToyConfig.IsEnabled is true)
 			{
-				Log.Error("Failed to create TextToy for custom role.");
+				this.TextToy = TextToyManager.SpawnTextForSchematic(this.SchematicObject, this.TextToyConfig);
+				if (this.TextToy is null)
+				{
+					Log.Error("Failed to create TextToy for custom role.");
+				}
 			}
 			
 			// Get Animator from SchematicObject
@@ -136,14 +149,11 @@
 			{
 				Log.Error("Failed to get Animator from custom role.");
 			}
-			
-			// Attach objects to the SchematicObject
-			this.Speaker.transform.SetParent(this.SchematicObject.transform);
 
 			if (this.IsPlayerInvisible is true)
 			{
 				this.SchematicObject.gameObject.AddComponent<MovementController>().
-					Init(player, this.SchematicOffset);
+					Init(player, this.SchematicConfig.Offset);
 			}
 			else
 			{
@@ -151,10 +161,13 @@
 			}
 			
 			// Attach HintController to the player
-			Timing.CallDelayed(0.1f, () =>
+			if (this.HintConfig.IsEnabled is true)
 			{
-				this.HintController = player.GameObject.AddComponent<HintController>();
-			});
+				Timing.CallDelayed(0.1f, () =>
+				{
+					this.HintController = player.GameObject.AddComponent<HintController>();
+				});
+			}
 		}
 
 		private void DestroyObjects()
