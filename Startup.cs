@@ -15,7 +15,7 @@ namespace RoleAPI
 		public static void SetupAPI(string pluginName)
 		{
 			// Patch
-			var harmony = new Harmony($"risottoman.{pluginName}");
+			Harmony harmony = new Harmony($"risottoman.{pluginName}");
 			harmony.PatchAll();
 			
 			// Path

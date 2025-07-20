@@ -7,9 +7,11 @@
 	using Controller;
 
 	using Exiled.API.Enums;
+	using Exiled.API.Extensions;
 	using Exiled.API.Features;
 	using Exiled.CustomRoles.API.Features;
 
+	using LabApi.Events.Arguments.PlayerEvents;
 	using LabApi.Features.Wrappers;
 
 	using Managers;
@@ -179,5 +181,45 @@
 
 			this.SchematicObject.Destroy();
 		}
+		
+		private void OnRoundStarted()
+		{
+			if (this.SpawnConfig.MinPlayers <= 0 || this.SpawnConfig.SpawnChance <= 0)
+				return;
+        
+			if (this.TrackedPlayers.Count >= this.SpawnProperties.Limit)
+				return;
+        
+			for (int i = 0; i < this.SpawnProperties.Limit; i++)
+			{
+				float chance = (float) Exiled.Loader.Loader.Random.NextDouble() * 100f;
+				Log.Debug($"chance {chance} and spawn chance {this.SpawnConfig.SpawnChance}");
+				
+				if (chance >= this.SpawnConfig.SpawnChance)
+					continue;
+				
+				Player randomPlayer = Player.List.GetRandomValue(r => r.IsHuman && !r.IsNPC && r.CustomInfo == null);
+
+				Timing.CallDelayed(0.05f, () =>
+				{
+					this.AddRole(randomPlayer);
+				});
+			}
+		}
+
+		private void OnPlayerValidatedVisibility(PlayerValidatedVisibilityEventArgs ev)
+		{
+			if (this.IsPlayerInvisible is not true)
+				return;
+			
+			if (!this.Check(ev.Target))
+				return;
+			
+			ev.IsVisible = false || ev.Target.CurrentSpectators.Contains(ev.Player);
+		}
+
+		// Unnecessary properties
+		[YamlIgnore]
+		public override float SpawnChance { get; set; }
 	}
 }

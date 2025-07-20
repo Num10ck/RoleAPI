@@ -42,7 +42,6 @@
     <Compile Include="API\Configs\HintConfig.cs" />
     <Compile Include="API\Configs\SchematicConfig.cs" />
     <Compile Include="API\Configs\TextToyConfig.cs" />
-    <Compile Include="EventHandler.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="API\Controller\CooldownController.cs" />
