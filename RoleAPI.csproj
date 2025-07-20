@@ -36,6 +36,7 @@
   </Target>
   <ItemGroup>
     <Compile Include="API\Configs\AudioConfig.cs" />
+    <Compile Include="API\Configs\SpawnConfig.cs" />
     <Compile Include="API\Controller\HintController.cs" />
     <Compile Include="API\Managers\TextToyManager.cs" />
     <Compile Include="API\Configs\EffectConfig.cs" />

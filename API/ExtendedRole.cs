@@ -37,6 +37,8 @@
 		
 		private static readonly Dictionary<Player, ExtendedRole> _instances = [];
 		
+		public abstract SpawnConfig SpawnConfig { get; set; }
+		
 		public abstract SchematicConfig SchematicConfig { get; set; }
 		
 		public abstract TextToyConfig TextToyConfig { get; set; }
