@@ -15,7 +15,6 @@
 			
 			var header = new HeaderSetting(
 				name: $"Abilities of {pluginName}",
-				hintDescription: $"Abilities of {pluginName}",
 				paddling: true
 			);
 			

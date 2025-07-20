@@ -68,7 +68,24 @@
 		
 		[YamlIgnore]
 		private HintController HintController { get; set; }
+		
+		[YamlIgnore]
+		private CooldownController CooldownController { get; set; }
 
+		protected override void SubscribeEvents()
+		{
+			base.SubscribeEvents();
+			Exiled.Events.Handlers.Server.RoundStarted += this.OnRoundStarted;
+			LabApi.Events.Handlers.PlayerEvents.ValidatedVisibility += this.OnPlayerValidatedVisibility;
+		}
+
+		protected override void UnsubscribeEvents()
+		{
+			Exiled.Events.Handlers.Server.RoundStarted -= this.OnRoundStarted;
+			LabApi.Events.Handlers.PlayerEvents.ValidatedVisibility -= this.OnPlayerValidatedVisibility;
+			base.UnsubscribeEvents();
+		}
+		
 		public override void AddRole(Player player)
 		{
 			player.Role.Set(this.Role, SpawnReason.ForceClass, RoleSpawnFlags.None);
@@ -92,7 +109,6 @@
 				);
 			}
 			
-			this.ShowMessage(player);
 			this.ShowBroadcast(player);
 			this.RoleAdded(player);
 			player.SendConsoleMessage(this.ConsoleMessage, "green");
@@ -163,6 +179,8 @@
 			{
 				this.SchematicObject.transform.SetParent(player.Transform);
 			}
+
+			this.CooldownController = player.GameObject.AddComponent<CooldownController>();
 			
 			// Attach HintController to the player
 			if (this.HintConfig.IsEnabled is true)
@@ -170,13 +188,15 @@
 				Timing.CallDelayed(0.1f, () =>
 				{
 					this.HintController = player.GameObject.AddComponent<HintController>();
+					this.HintController.Init(HintConfig);
 				});
 			}
 		}
 
 		private void DestroyObjects()
 		{
-			//Destroy(this.HintController);
+			Object.Destroy(this.HintController);
+			Object.Destroy(this.CooldownController);
 			
 			this.AudioPlayer.RemoveAllClips();
 			this.AudioPlayer.Destroy();

@@ -2,7 +2,8 @@ namespace RoleAPI.API.Controller
 {
 	using System.Collections.Generic;
 	using System.Linq;
-	using System.Text;
+
+	using Configs;
 
 	using Exiled.API.Features;
 
@@ -15,12 +16,14 @@ namespace RoleAPI.API.Controller
 		private Player _player;
 		private List<IAbility> _abilities;
 		private CooldownController _controller;
+		private string _text;
 		
-		public void Awake()
+		public void Init(HintConfig config)
 		{
 			_player = Player.Get(gameObject);
 			_controller = gameObject.GetComponent<CooldownController>();
 			_abilities = Managers.AbilityRegistrator.GetAbilities.OrderBy(r => r.KeyId).ToList();
+			_text = config.Text;
 			
 			InvokeRepeating(nameof(CheckHint), 0f, 0.5f);
 			Log.Debug($"[CooldownController] Invoke the hint cycle");
@@ -28,11 +31,7 @@ namespace RoleAPI.API.Controller
     
 		void CheckHint()
 		{
-			StringBuilder stringBuilder = new();
-			stringBuilder.Append("<align=right>");
-			stringBuilder.Append("<size=50><color=#ffa500>\ud83d\ude06 <b>SCP-999</b></color></size>\n");
-			stringBuilder.Append("Abilities:\n");
-        
+			/* TODO How? 
 			foreach (var ability in _abilities)
 			{
 				string color = "#ffa500";
@@ -42,11 +41,9 @@ namespace RoleAPI.API.Controller
 				}
                     
 				stringBuilder.Append($"<color={color}>{ability.Name}  [{ability.KeyCode}]</color>\n");
-			}
-                
-			stringBuilder.Append($"\n<size=18>if you cant use abilities\nremove \u2b50 in settings</size>");
-			stringBuilder.Append("</align>\n\n\n\n\n\n\n");
-			_player.ShowHint(stringBuilder.ToString(), 1f);
+			}*/
+			
+			_player.ShowHint(_text, 1f);
 		}
     
 		void OnDestroy()
