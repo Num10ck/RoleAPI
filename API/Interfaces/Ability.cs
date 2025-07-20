@@ -1,5 +1,7 @@
 ﻿namespace RoleAPI.API.Interfaces
 {
+	using System.Linq;
+
 	using Controller;
 
 	using Exiled.API.Features;
@@ -31,14 +33,14 @@
 			// Check keybind settings
 			if (settingBase is not SSKeybindSetting keybindSetting || keybindSetting.SettingId != KeyId || !keybindSetting.SyncIsPressed)
 				return;
-
+			
 			// Check player and role
 			if (!Player.TryGet(referenceHub, out Player player) ||
-				ExtendedRole.Instances.TryGetValue(player, out ExtendedRole role))
+				!ExtendedRole.Instances.TryGetValue(player, out ExtendedRole role))
 			{
 				return;
 			}
-
+			
 			if (role.Animator != null)
 			{
 				// If the current animation is not idle, then in progress
@@ -49,15 +51,21 @@
 					return;
 				}
 			}
-
+			
+			// Check current audio clip
+			// If any sound is being played now, then we skip the ability
+			AudioPlayer audioPlayer = role.AudioPlayer;
+			if (audioPlayer is not null && audioPlayer.ClipsById.Any())
+				return;
+			
 			// Check cooldown for an ability
 			CooldownController cooldown = player.GameObject.GetComponent<CooldownController>();
 			if (!cooldown.IsAbilityAvailable(Name))
 				return;
-
+			
 			// Set a cooldown for an ability
 			cooldown.SetCooldownForAbility(Name, Cooldown);
-
+			
 			// Activate an ability
 			ActivateAbility(player, role);
 			Log.Debug($"[Ability] Activating the {Name} ability");
