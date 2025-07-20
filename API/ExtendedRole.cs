@@ -51,6 +51,8 @@
 		
 		public abstract bool IsPlayerInvisible { get; set; }
 		
+		public abstract bool IsShowPlayerNickname { get; set; }
+		
 		[YamlIgnore]
 		private SchematicObject SchematicObject { get; set; }
 
@@ -98,7 +100,13 @@
 			player.Health = this.MaxHealth;
 			player.MaxHealth = this.MaxHealth;
 			player.Scale = this.Scale;
+
 			player.CustomName = this.Name;
+			if (this.IsShowPlayerNickname is true)
+			{
+				player.CustomName = $"{this.Name} {player.Nickname}";
+			}
+			
 			player.CustomInfo = player.CustomName + "\n" + this.CustomInfo;
 			
 			foreach (EffectConfig effect in this.Effects)
