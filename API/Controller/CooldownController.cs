@@ -16,11 +16,11 @@
 		void Awake()
 		{
 			_abilityCooldown = AbilityRegistrator.GetAbilities.ToDictionary(a => a.Name, _ => 0f);
-			InvokeRepeating(nameof(CheckCooldown), 0f, 1f);
+			InvokeRepeating(nameof(UpdateCooldown), 0f, 1f);
 			Log.Debug($"[CooldownController] Invoke the cooldown cycle");
 		}
 
-		void CheckCooldown()
+		void UpdateCooldown()
 		{
 			foreach (var key in _abilityCooldown.Keys.ToList())
 			{
@@ -37,7 +37,7 @@
 
 		void OnDestroy()
 		{
-			CancelInvoke(nameof(CheckCooldown));
+			CancelInvoke(nameof(UpdateCooldown));
 			Log.Debug($"[CooldownController] Cancel the cooldown cycle");
 		}
 
