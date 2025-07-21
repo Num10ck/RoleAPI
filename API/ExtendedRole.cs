@@ -238,8 +238,8 @@
 				
 				if (chance >= this.SpawnConfig.SpawnChance)
 					continue;
-				
-				Player randomPlayer = Player.List.GetRandomValue(r => r.IsHuman && !r.IsNPC && r.CustomInfo == null);
+
+				Player randomPlayer = Player.List.GetRandomValue(r => r.IsHuman && !(r.IsNPC || this.SpawnConfig.Debug) && r.CustomInfo == null);
 
 				Timing.CallDelayed(0.05f, () =>
 				{
