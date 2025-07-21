@@ -2,6 +2,10 @@
 {
 	using Configs;
 
+	using Exiled.API.Features;
+
+	using Mirror;
+
 	using ProjectMER.Features;
 	using ProjectMER.Features.Objects;
 
@@ -22,6 +26,17 @@
 		public static Animator GetAnimatorFromSchematic(SchematicObject schematicObject)
 		{
 			return schematicObject?.GetComponentInChildren<Animator>(true);
+		}
+
+		public static void MakeSchematicInvisibleForOwner(SchematicObject schematicObject, Player player)
+		{
+			foreach (var identity in schematicObject.NetworkIdentities)
+			{
+				player.Connection.Send(new ObjectDestroyMessage
+				{
+					netId = identity.netId
+				});
+			}
 		}
 	}
 }

@@ -4,6 +4,8 @@ namespace RoleAPI.API.Managers
 
 	using LabApi.Features.Wrappers;
 
+	using Mirror;
+
 	using ProjectMER.Features.Objects;
 
 	using UnityEngine;
@@ -26,6 +28,14 @@ namespace RoleAPI.API.Managers
 			textToyObject.Spawn();
 
 			return textToyObject;
+		}
+		
+		public static void MakeTextInvisibleForOwner(TextToy textToy, Player player)
+		{
+			player.Connection.Send(new ObjectDestroyMessage
+			{
+				netId = textToy.Base.netId
+			});
 		}
 	}
 }

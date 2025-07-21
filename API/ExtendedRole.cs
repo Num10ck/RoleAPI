@@ -146,6 +146,12 @@
 				return;
 			}
 			
+			// Make schematic invisible for owner
+			if (this.SchematicConfig.IsSchematicVisibleForOwner is false)
+			{
+				SchematicManager.MakeSchematicInvisibleForOwner(this.SchematicObject, player);
+			}
+			
 			// Create AudioPlayer for player
 			if (this.AudioConfig.Volume > 0)
 			{
@@ -165,7 +171,12 @@
 			if (this.TextToyConfig.IsEnabled is true)
 			{
 				this.TextToy = TextToyManager.SpawnTextForSchematic(this.SchematicObject, this.TextToyConfig);
-				if (this.TextToy is null)
+				if (this.TextToy is not null)
+				{
+					// Make TextToy invisible for Player
+					TextToyManager.MakeTextInvisibleForOwner(this.TextToy, player);
+				}
+				else
 				{
 					Log.Error("Failed to create TextToy for custom role.");
 				}
