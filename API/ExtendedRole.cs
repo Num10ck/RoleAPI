@@ -1,6 +1,7 @@
 ﻿namespace RoleAPI.API
 {
 	using System.Collections.Generic;
+	using System.Linq;
 
 	using Configs;
 
@@ -196,7 +197,16 @@
 			}
 			else
 			{
-				this.SchematicObject.transform.SetParent(player.Transform);
+				this.SchematicObject.transform.position = player.Position + this.SchematicConfig.Offset;
+				
+				if (this.SchematicConfig.IsAttachToCamera)
+				{
+					this.SchematicObject.transform.parent = player.CameraTransform;
+				}
+				else
+				{
+					this.SchematicObject.transform.parent = player.Transform;
+				}
 			}
 
 			this.CooldownController = player.GameObject.AddComponent<CooldownController>();
@@ -239,8 +249,9 @@
 				if (chance >= this.SpawnConfig.SpawnChance)
 					continue;
 
-				Player randomPlayer = Player.List.GetRandomValue(r => r.IsHuman && !(r.IsNPC || this.SpawnConfig.Debug) && r.CustomInfo == null);
-
+				Player randomPlayer = Player.List.GetRandomValue(r =>
+					r.IsHuman && (!r.IsNPC || this.SpawnConfig.Debug) && r.CustomInfo == null);
+				
 				Timing.CallDelayed(0.05f, () =>
 				{
 					this.AddRole(randomPlayer);
