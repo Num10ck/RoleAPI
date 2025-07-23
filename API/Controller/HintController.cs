@@ -53,7 +53,7 @@ namespace RoleAPI.API.Controller
 				
 				parameters.Add(new SSKeybindHintParameter(ability.KeyId));
 			}
-
+			
 			text.Append("\n\n\n\n\n\n\n");
 			_player.HintDisplay.Show(new TextHint(
 				text.ToString(), 
