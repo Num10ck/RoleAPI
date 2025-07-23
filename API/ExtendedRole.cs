@@ -2,6 +2,7 @@
 {
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Text.RegularExpressions;
 
 	using Configs;
 
@@ -11,6 +12,7 @@
 	using Exiled.API.Extensions;
 	using Exiled.API.Features;
 	using Exiled.CustomRoles.API.Features;
+	using Exiled.Events.EventArgs.Player;
 
 	using LabApi.Events.Arguments.PlayerEvents;
 	using LabApi.Features.Wrappers;
@@ -27,6 +29,7 @@
 
 	using YamlDotNet.Serialization;
 
+	using Cassie = Exiled.API.Features.Cassie;
 	using Player = Exiled.API.Features.Player;
 
 	public abstract class ExtendedRole : CustomRole
@@ -78,12 +81,14 @@
 		protected override void SubscribeEvents()
 		{
 			base.SubscribeEvents();
+			Exiled.Events.Handlers.Player.Died += this.OnDied;
 			Exiled.Events.Handlers.Server.RoundStarted += this.OnRoundStarted;
 			LabApi.Events.Handlers.PlayerEvents.ValidatedVisibility += this.OnPlayerValidatedVisibility;
 		}
 
 		protected override void UnsubscribeEvents()
 		{
+			Exiled.Events.Handlers.Player.Died -= this.OnDied;
 			Exiled.Events.Handlers.Server.RoundStarted -= this.OnRoundStarted;
 			LabApi.Events.Handlers.PlayerEvents.ValidatedVisibility -= this.OnPlayerValidatedVisibility;
 			base.UnsubscribeEvents();
@@ -232,6 +237,16 @@
 
 			this.SchematicObject.Destroy();
 		}
+
+		private void OnDied(DiedEventArgs ev)
+		{
+			if (!this.Check(ev.Player))
+				return;
+
+			string numbers = Regex.Replace(this.Name, "[^0-9]+", string.Empty); // SCP-999 -> 999
+			numbers = string.Join(" ", numbers.ToCharArray()); // 999 -> 9 9 9
+			Cassie.MessageTranslated($"SCP {numbers} contained successfully.", $"{this.Name} contained successfully.");
+		}
 		
 		private void OnRoundStarted()
 		{
@@ -250,7 +265,7 @@
 					continue;
 
 				Player randomPlayer = Player.List.GetRandomValue(r =>
-					r.IsHuman && (!r.IsNPC || this.SpawnConfig.Debug) && r.CustomInfo == null);
+					r.IsHuman && (!r.IsNPC || this.SpawnConfig.IsSpawnForDummy) && r.CustomInfo == null);
 				
 				Timing.CallDelayed(0.05f, () =>
 				{
