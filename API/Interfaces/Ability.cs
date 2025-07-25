@@ -6,6 +6,8 @@
 
 	using Exiled.API.Features;
 
+	using Managers;
+
 	using UnityEngine;
 
 	using UserSettings.ServerSpecific;
@@ -36,16 +38,16 @@
 			
 			// Check player and role
 			if (!Player.TryGet(referenceHub, out Player player) ||
-				!ExtendedRole.Instances.TryGetValue(player, out ExtendedRole role))
+				!ExtendedRole.Instances.TryGetValue(player, out ObjectManager manager))
 			{
 				return;
 			}
 			
-			if (role.Animator != null)
+			if (manager.Animator != null)
 			{
 				// If the current animation is not idle, then in progress
 				// I would like the animation of the ability to stop, as otherwise it will be possible to play multiple animations at a time
-				AnimatorStateInfo stateInfo = role.Animator.GetCurrentAnimatorStateInfo(0);
+				AnimatorStateInfo stateInfo = manager.Animator.GetCurrentAnimatorStateInfo(0);
 				if (!stateInfo.IsName("IdleAnimation"))
 				{
 					return;
@@ -54,7 +56,7 @@
 			
 			// Check current audio clip
 			// If any sound is being played now, then we skip the ability
-			AudioPlayer audioPlayer = role.AudioPlayer;
+			AudioPlayer audioPlayer = manager.AudioPlayer;
 			if (audioPlayer is not null && audioPlayer.ClipsById.Any())
 				return;
 			
@@ -67,10 +69,10 @@
 			cooldown.SetCooldownForAbility(Name, Cooldown);
 			
 			// Activate an ability
-			ActivateAbility(player, role);
+			ActivateAbility(player, manager);
 			Log.Debug($"[Ability] Activating the {Name} ability");
 		}
 
-		protected abstract void ActivateAbility(Player player, ExtendedRole role);
+		protected abstract void ActivateAbility(Player player, ObjectManager manager);
 	}
 }

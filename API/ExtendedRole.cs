@@ -1,12 +1,9 @@
 ﻿namespace RoleAPI.API
 {
 	using System.Collections.Generic;
-	using System.Linq;
 	using System.Text.RegularExpressions;
 
 	using Configs;
-
-	using Controller;
 
 	using Exiled.API.Enums;
 	using Exiled.API.Extensions;
@@ -15,17 +12,12 @@
 	using Exiled.Events.EventArgs.Player;
 
 	using LabApi.Events.Arguments.PlayerEvents;
-	using LabApi.Features.Wrappers;
 
 	using Managers;
 
 	using MEC;
 
 	using PlayerRoles;
-
-	using ProjectMER.Features.Objects;
-
-	using UnityEngine;
 
 	using YamlDotNet.Serialization;
 
@@ -34,12 +26,12 @@
 
 	public abstract class ExtendedRole : CustomRole
 	{
-		public static IReadOnlyDictionary<Player, ExtendedRole> Instances
+		public static IReadOnlyDictionary<Player, ObjectManager> Instances
 		{
 			get => _instances;
 		}
 		
-		private static readonly Dictionary<Player, ExtendedRole> _instances = [];
+		private static readonly Dictionary<Player, ObjectManager> _instances = [];
 		
 		public abstract SpawnConfig SpawnConfig { get; set; }
 		
@@ -57,27 +49,6 @@
 		
 		public abstract bool IsShowPlayerNickname { get; set; }
 		
-		[YamlIgnore]
-		private SchematicObject SchematicObject { get; set; }
-
-		[YamlIgnore]
-		public AudioPlayer AudioPlayer { get; set; }
-		
-		[YamlIgnore]
-		public Animator Animator { get; set; }
-
-		[YamlIgnore]
-		public Speaker Speaker { get; set; }
-		
-		[YamlIgnore]
-		private TextToy TextToy { get; set; }
-		
-		[YamlIgnore]
-		private HintController HintController { get; set; }
-		
-		[YamlIgnore]
-		private CooldownController CooldownController { get; set; }
-
 		protected override void SubscribeEvents()
 		{
 			base.SubscribeEvents();
@@ -126,116 +97,24 @@
 			this.ShowBroadcast(player);
 			this.RoleAdded(player);
 			player.SendConsoleMessage(this.ConsoleMessage, "green");
+
+			ObjectManager manager = new();
+			manager.CreateObjects(player, this);
 			
-			_instances.Add(player, this);
-			
-			this.CreateObjects(player);
+			_instances.Add(player, manager);
 		}
 
 		public override void RemoveRole(Player player)
 		{
-			this.DestroyObjects();
+			if (_instances.TryGetValue(player, out ObjectManager manager))
+			{
+				manager.DestroyObjects();
+				_instances.Remove(player);
+			}
 			
 			player.CustomName = null;
-			_instances.Remove(player);
 			
 			base.RemoveRole(player);
-		}
-
-		private void CreateObjects(Player player)
-		{
-			// Create SchematicObject from SchematicName
-			this.SchematicObject = SchematicManager.SpawnSchematic(this.SchematicConfig);
-			if (this.SchematicObject is null)
-			{
-				Log.Error("Failed to create Schematic for custom role.");
-				return;
-			}
-			
-			// Make schematic invisible for owner
-			if (this.SchematicConfig.IsSchematicVisibleForOwner is false)
-			{
-				SchematicManager.MakeSchematicInvisibleForOwner(this.SchematicObject, player);
-			}
-			
-			// Create AudioPlayer for player
-			if (this.AudioConfig.Volume > 0)
-			{
-				this.AudioPlayer = player.AddAudio(this.AudioConfig);
-				if (!this.AudioPlayer.TryGetSpeaker($"{this.AudioConfig.Name}-speaker", out Speaker speaker))
-				{
-					Log.Error("Failed to get Speaker from custom role.");
-					return;
-				}
-				
-				// Attach speaker to schematic
-				this.Speaker = speaker;
-				this.Speaker.transform.SetParent(this.SchematicObject.transform);
-			}
-			
-			// Create TextToy and attach to the SchematicObject
-			if (this.TextToyConfig.IsEnabled is true)
-			{
-				this.TextToy = TextToyManager.SpawnTextForSchematic(this.SchematicObject, this.TextToyConfig);
-				if (this.TextToy is not null)
-				{
-					// Make TextToy invisible for Player
-					TextToyManager.MakeTextInvisibleForOwner(this.TextToy, player);
-				}
-				else
-				{
-					Log.Error("Failed to create TextToy for custom role.");
-				}
-			}
-			
-			// Get Animator from SchematicObject
-			this.Animator = SchematicManager.GetAnimatorFromSchematic(this.SchematicObject);
-			if (this.Animator is null)
-			{
-				Log.Error("Failed to get Animator from custom role.");
-			}
-
-			if (this.IsPlayerInvisible is true)
-			{
-				this.SchematicObject.gameObject.AddComponent<MovementController>().
-					Init(player, this.SchematicConfig.Offset);
-			}
-			else
-			{
-				this.SchematicObject.transform.position = player.Position + this.SchematicConfig.Offset;
-				
-				if (this.SchematicConfig.IsAttachToCamera)
-				{
-					this.SchematicObject.transform.parent = player.CameraTransform;
-				}
-				else
-				{
-					this.SchematicObject.transform.parent = player.Transform;
-				}
-			}
-
-			this.CooldownController = player.GameObject.AddComponent<CooldownController>();
-			
-			// Attach HintController to the player
-			if (this.HintConfig.IsEnabled is true)
-			{
-				Timing.CallDelayed(0.1f, () =>
-				{
-					this.HintController = player.GameObject.AddComponent<HintController>();
-					this.HintController.Init(HintConfig);
-				});
-			}
-		}
-
-		private void DestroyObjects()
-		{
-			Object.Destroy(this.HintController);
-			Object.Destroy(this.CooldownController);
-			
-			this.AudioPlayer.RemoveAllClips();
-			this.AudioPlayer.Destroy();
-
-			this.SchematicObject.Destroy();
 		}
 
 		private void OnDied(DiedEventArgs ev)
@@ -250,12 +129,12 @@
 		
 		private void OnRoundStarted()
 		{
-			if (this.SpawnConfig.MinPlayers <= 0 || this.SpawnConfig.SpawnChance <= 0)
+			if (this.SpawnConfig.MinPlayers > Player.List.Count || this.SpawnConfig.SpawnChance <= 0)
 				return;
-        
+			
 			if (this.TrackedPlayers.Count >= this.SpawnProperties.Limit)
 				return;
-        
+			
 			for (int i = 0; i < this.SpawnProperties.Limit; i++)
 			{
 				float chance = (float) Exiled.Loader.Loader.Random.NextDouble() * 100f;
