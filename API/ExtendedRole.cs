@@ -42,6 +42,8 @@
 		public abstract HintConfig HintConfig { get; set; }
 		
 		public abstract AudioConfig AudioConfig { get; set; }
+
+		public abstract AbilityConfig AbilityConfig { get; set; }
 		
 		public abstract List<EffectConfig> Effects { get; set; }
 		

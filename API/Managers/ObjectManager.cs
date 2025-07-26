@@ -1,5 +1,10 @@
 namespace RoleAPI.API.Managers
 {
+	using System;
+	using System.Collections.Generic;
+
+	using Controller;
+
 	using Exiled.API.Features;
 
 	using LabApi.Features.Wrappers;
@@ -8,27 +13,33 @@ namespace RoleAPI.API.Managers
 
 	using ProjectMER.Features.Objects;
 
-	using Controller;
-
 	using UnityEngine;
 
 	using Player = Exiled.API.Features.Player;
 
-	public class ObjectManager
+	public sealed class ObjectManager
 	{
 		public SchematicObject SchematicObject { get; set; }
+
 		public AudioPlayer AudioPlayer { get; set; }
+
 		public Animator Animator { get; set; }
+
 		public Speaker Speaker { get; set; }
+
 		public TextToy TextToy { get; set; }
+
 		public HintController HintController { get; set; }
+
 		public CooldownController CooldownController { get; set; }
+
+		public List<Type> AllowedAbilities { get; set; }
 		
 		public void CreateObjects(Player player, ExtendedRole config)
 		{
 			// Create SchematicObject from SchematicName
-			this.SchematicObject = SchematicManager.SpawnSchematic(config.SchematicConfig);
-			if (this.SchematicObject is null)
+			SchematicObject = SchematicManager.SpawnSchematic(config.SchematicConfig);
+			if (SchematicObject is null)
 			{
 				Log.Debug("Failed to create Schematic for custom role.");
 				return;
@@ -37,32 +48,32 @@ namespace RoleAPI.API.Managers
 			// Make schematic invisible for owner
 			if (config.SchematicConfig.IsSchematicVisibleForOwner is false)
 			{
-				SchematicManager.MakeSchematicInvisibleForOwner(this.SchematicObject, player);
+				SchematicManager.MakeSchematicInvisibleForOwner(SchematicObject, player);
 			}
 			
 			// Create AudioPlayer for player
 			if (config.AudioConfig.Volume > 0)
 			{
-				this.AudioPlayer = player.AddAudio(config.AudioConfig);
-				if (!this.AudioPlayer.TryGetSpeaker($"{config.AudioConfig.Name}-speaker", out Speaker speaker))
+				AudioPlayer = player.AddAudio(config.AudioConfig);
+				if (!AudioPlayer.TryGetSpeaker($"{config.AudioConfig.Name}-speaker", out Speaker speaker))
 				{
 					Log.Debug("Failed to get Speaker from custom role.");
 					return;
 				}
 				
 				// Attach speaker to schematic
-				this.Speaker = speaker;
-				this.Speaker.transform.SetParent(this.SchematicObject.transform);
+				Speaker = speaker;
+				Speaker.transform.SetParent(SchematicObject.transform);
 			}
 			
 			// Create TextToy and attach to the SchematicObject
 			if (config.TextToyConfig.IsEnabled is true)
 			{
-				this.TextToy = TextToyManager.SpawnTextForSchematic(this.SchematicObject, config.TextToyConfig);
-				if (this.TextToy is not null)
+				TextToy = TextToyManager.SpawnTextForSchematic(SchematicObject, config.TextToyConfig);
+				if (TextToy is not null)
 				{
 					// Make TextToy invisible for Player
-					TextToyManager.MakeTextInvisibleForOwner(this.TextToy, player);
+					TextToyManager.MakeTextInvisibleForOwner(TextToy, player);
 				}
 				else
 				{
@@ -72,53 +83,55 @@ namespace RoleAPI.API.Managers
 			
 			// Get Animator from SchematicObject
 			
-			this.Animator = SchematicManager.GetAnimatorFromSchematic(this.SchematicObject);
-			if (this.Animator is null)
+			Animator = SchematicManager.GetAnimatorFromSchematic(SchematicObject);
+			if (Animator is null)
 			{
 				Log.Debug("Failed to get Animator from custom role.");
 			}
 			
 			if (config.IsPlayerInvisible is true)
 			{
-				this.SchematicObject.gameObject.AddComponent<MovementController>().
+				SchematicObject.gameObject.AddComponent<MovementController>().
 					Init(player, config.SchematicConfig.Offset);
 			}
 			else
 			{
-				this.SchematicObject.transform.position = player.Position + config.SchematicConfig.Offset;
+				SchematicObject.transform.position = player.Position + config.SchematicConfig.Offset;
 				
 				if (config.SchematicConfig.IsAttachToCamera)
 				{
-					this.SchematicObject.transform.parent = player.CameraTransform; //todo
+					SchematicObject.transform.parent = player.CameraTransform; //todo
 				}
 				else
 				{
-					this.SchematicObject.transform.parent = player.Transform;
+					SchematicObject.transform.parent = player.Transform;
 				}
 			}
 			
-			this.CooldownController = player.GameObject.AddComponent<CooldownController>();
+			CooldownController = player.GameObject.AddComponent<CooldownController>();
 			
 			// Attach HintController to the player
 			if (config.HintConfig.IsEnabled is true)
 			{
 				Timing.CallDelayed(0.1f, () =>
 				{
-					this.HintController = player.GameObject.AddComponent<HintController>();
-					this.HintController.Init(config.HintConfig);
+					HintController = player.GameObject.AddComponent<HintController>();
+					HintController.Init(config.HintConfig);
 				});
 			}
+
+			AllowedAbilities = new(config.AbilityConfig.AbilityTypes);
 		}
 
 		public void DestroyObjects()
 		{
-			Object.Destroy(this.HintController);
-			Object.Destroy(this.CooldownController);
+			UnityEngine.Object.Destroy(HintController);
+			UnityEngine.Object.Destroy(CooldownController);
 			
-			this.AudioPlayer.RemoveAllClips();
-			this.AudioPlayer.Destroy();
+			AudioPlayer.RemoveAllClips();
+			AudioPlayer.Destroy();
 
-			this.SchematicObject.Destroy();
+			SchematicObject.Destroy();
 		}
 	}
 }

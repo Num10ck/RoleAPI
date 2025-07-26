@@ -38,7 +38,8 @@
 			
 			// Check player and role
 			if (!Player.TryGet(referenceHub, out Player player) ||
-				!ExtendedRole.Instances.TryGetValue(player, out ObjectManager manager))
+				!ExtendedRole.Instances.TryGetValue(player, out ObjectManager manager) ||
+				!manager.AllowedAbilities.Contains(GetType()))
 			{
 				return;
 			}
