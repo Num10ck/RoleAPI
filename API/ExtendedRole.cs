@@ -33,6 +33,8 @@
 		
 		private static readonly Dictionary<Player, ObjectManager> _instances = [];
 		
+		public abstract string CustomDeathText { get; set; }
+		
 		public abstract SpawnConfig SpawnConfig { get; set; }
 		
 		public abstract SchematicConfig SchematicConfig { get; set; }
@@ -54,14 +56,14 @@
 		protected override void SubscribeEvents()
 		{
 			base.SubscribeEvents();
-			Exiled.Events.Handlers.Player.Died += this.OnDied;
+			Exiled.Events.Handlers.Player.Dying += this.OnDying;
 			Exiled.Events.Handlers.Server.RoundStarted += this.OnRoundStarted;
 			LabApi.Events.Handlers.PlayerEvents.ValidatedVisibility += this.OnPlayerValidatedVisibility;
 		}
 
 		protected override void UnsubscribeEvents()
 		{
-			Exiled.Events.Handlers.Player.Died -= this.OnDied;
+			Exiled.Events.Handlers.Player.Dying -= this.OnDying;
 			Exiled.Events.Handlers.Server.RoundStarted -= this.OnRoundStarted;
 			LabApi.Events.Handlers.PlayerEvents.ValidatedVisibility -= this.OnPlayerValidatedVisibility;
 			base.UnsubscribeEvents();
@@ -119,11 +121,11 @@
 			base.RemoveRole(player);
 		}
 
-		private void OnDied(DiedEventArgs ev)
+		private void OnDying(DyingEventArgs ev)
 		{
 			if (!this.Check(ev.Player))
 				return;
-
+ 
 			string numbers = Regex.Replace(this.Name, "[^0-9]+", string.Empty); // SCP-999 -> 999
 			numbers = string.Join(" ", numbers.ToCharArray()); // 999 -> 9 9 9
 			Cassie.MessageTranslated($"SCP {numbers} contained successfully.", $"{this.Name} contained successfully.");
@@ -147,6 +149,11 @@
 
 				Player randomPlayer = Player.List.GetRandomValue(r =>
 					r.IsHuman && (!r.IsNPC || this.SpawnConfig.IsSpawnForDummy) && r.CustomInfo == null);
+
+				if (randomPlayer.SessionVariables.ContainsKey("risottoMan.customRoles"))
+					return;
+				
+				randomPlayer.SessionVariables["risottoMan.customRoles"] = this.Name;
 				
 				Timing.CallDelayed(0.05f, () =>
 				{
