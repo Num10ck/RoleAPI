@@ -55,7 +55,6 @@
     <Compile Include="API\Managers\AudioExtensions.cs" />
     <Compile Include="API\Managers\KeybindManager.cs" />
     <Compile Include="API\Managers\SchematicManager.cs" />
-    <Compile Include="API\Patches\SchematicMerPatch.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ExMod.Exiled">
