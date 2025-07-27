@@ -35,6 +35,7 @@
     <Exec Command="copy /Y $(TargetPath) &quot;$(SL_REFERENCES)\&quot;" />
   </Target>
   <ItemGroup>
+    <Compile Include="API\Configs\AbilityConfig.cs" />
     <Compile Include="API\Configs\AudioConfig.cs" />
     <Compile Include="API\Configs\SpawnConfig.cs" />
     <Compile Include="API\Controller\HintController.cs" />
