@@ -45,6 +45,7 @@
 		
 		public abstract AudioConfig AudioConfig { get; set; }
 
+		[YamlIgnore]
 		public abstract AbilityConfig AbilityConfig { get; set; }
 		
 		public abstract List<EffectConfig> Effects { get; set; }
@@ -55,6 +56,11 @@
 		
 		protected override void SubscribeEvents()
 		{
+			// Register abilities and keybinds
+			this.AbilityConfig.Abilities = AbilityRegistrator.RegisterAbilities(AbilityConfig.AbilityTypes);
+			KeybindManager.RegisterKeybinds(this.Name, this.AbilityConfig.Abilities);
+			
+			// Subscribe events
 			base.SubscribeEvents();
 			Exiled.Events.Handlers.Player.Dying += this.OnDying;
 			Exiled.Events.Handlers.Server.RoundStarted += this.OnRoundStarted;

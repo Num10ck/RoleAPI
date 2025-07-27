@@ -1,13 +1,13 @@
 ﻿namespace RoleAPI.API.Configs
 {
 	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Text;
-	using System.Threading.Tasks;
+
+	using Interfaces;
 
 	public class AbilityConfig
 	{
 		public Type[] AbilityTypes { get; set; }
+
+		public IAbility[] Abilities { get; set; }
 	}
 }

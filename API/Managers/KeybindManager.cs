@@ -1,5 +1,6 @@
 ﻿namespace RoleAPI.API.Managers
 {
+	using System;
 	using System.Collections.Generic;
 
 	using Exiled.API.Features.Core.UserSettings;
@@ -9,7 +10,7 @@
 	public static class KeybindManager
 	{
 		private static IEnumerable<SettingBase> _settings;
-		public static void RegisterKeybinds(IEnumerable<IAbility> abilities, string pluginName)
+		public static void RegisterKeybinds(string pluginName, IAbility[] abilities)
 		{
 			List<SettingBase> settings = new();
 			

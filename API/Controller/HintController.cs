@@ -18,16 +18,16 @@ namespace RoleAPI.API.Controller
 	public class HintController : MonoBehaviour
 	{
 		private Player _player;
-		private List<IAbility> _abilities;
+		private IAbility[] _abilities;
 		private CooldownController _controller;
-		private HintConfig _config;
+		private HintConfig _hintConfig;
 		
-		public void Init(HintConfig config)
+		public void Init(HintConfig hintConfig, AbilityConfig abilityConfig)
 		{
 			_player = Player.Get(gameObject);
 			_controller = gameObject.GetComponent<CooldownController>();
-			_abilities = Managers.AbilityRegistrator.GetAbilities.OrderBy(r => r.KeyId).ToList();
-			_config = config;
+			_abilities = abilityConfig.Abilities;
+			_hintConfig = hintConfig;
 			
 			InvokeRepeating(nameof(UpdateHint), 0f, 0.5f);
 			Log.Debug($"[CooldownController] Invoke the hint cycle");
@@ -36,13 +36,13 @@ namespace RoleAPI.API.Controller
 		void UpdateHint()
 		{
 			List<HintParameter> parameters = [];
-			StringBuilder text = new StringBuilder(_config.Text);
+			StringBuilder text = new StringBuilder(_hintConfig.Text);
 			
 			foreach (var ability in _abilities)
 			{
 				string color = _controller.IsAbilityAvailable(ability.Name) 
-					? _config.AvailableAbilityColor 
-					: _config.UnavailableAbilityColor;
+					? _hintConfig.AvailableAbilityColor 
+					: _hintConfig.UnavailableAbilityColor;
 
 				int index = text.ToString().IndexOf("%color%", StringComparison.Ordinal);
 				if (index != -1)

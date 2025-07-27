@@ -7,6 +7,8 @@ namespace RoleAPI.API.Managers
 
 	using Exiled.API.Features;
 
+	using Interfaces;
+
 	using LabApi.Features.Wrappers;
 
 	using MEC;
@@ -33,7 +35,7 @@ namespace RoleAPI.API.Managers
 
 		public CooldownController CooldownController { get; set; }
 
-		public List<Type> AllowedAbilities { get; set; }
+		public Type[] AllowedAbilities { get; set; }
 		
 		public void CreateObjects(Player player, ExtendedRole config)
 		{
@@ -108,7 +110,9 @@ namespace RoleAPI.API.Managers
 				}
 			}
 			
+			// Attach CooldownController to the player
 			CooldownController = player.GameObject.AddComponent<CooldownController>();
+			CooldownController.Init(config.AbilityConfig);
 			
 			// Attach HintController to the player
 			if (config.HintConfig.IsEnabled is true)
@@ -116,11 +120,11 @@ namespace RoleAPI.API.Managers
 				Timing.CallDelayed(0.1f, () =>
 				{
 					HintController = player.GameObject.AddComponent<HintController>();
-					HintController.Init(config.HintConfig);
+					HintController.Init(config.HintConfig, config.AbilityConfig);
 				});
 			}
 
-			AllowedAbilities = new(config.AbilityConfig.AbilityTypes);
+			AllowedAbilities = config.AbilityConfig.AbilityTypes;
 		}
 
 		public void DestroyObjects()

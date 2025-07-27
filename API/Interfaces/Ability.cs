@@ -1,5 +1,6 @@
 ﻿namespace RoleAPI.API.Interfaces
 {
+	using System;
 	using System.Linq;
 
 	using Controller;
@@ -32,46 +33,55 @@
 
 		private void OnKeybindActivateAbility(ReferenceHub referenceHub, ServerSpecificSettingBase settingBase)
 		{
-			// Check keybind settings
-			if (settingBase is not SSKeybindSetting keybindSetting || keybindSetting.SettingId != KeyId || !keybindSetting.SyncIsPressed)
-				return;
-			
-			// Check player and role
-			if (!Player.TryGet(referenceHub, out Player player) ||
-				!ExtendedRole.Instances.TryGetValue(player, out ObjectManager manager) ||
-				!manager.AllowedAbilities.Contains(GetType()))
+			try
 			{
-				return;
-			}
-			
-			if (manager.Animator != null)
-			{
-				// If the current animation is not idle, then in progress
-				// I would like the animation of the ability to stop, as otherwise it will be possible to play multiple animations at a time
-				AnimatorStateInfo stateInfo = manager.Animator.GetCurrentAnimatorStateInfo(0);
-				if (!stateInfo.IsName("IdleAnimation"))
+				// Check keybind settings
+				if (settingBase is not SSKeybindSetting keybindSetting || keybindSetting.SettingId != KeyId || !keybindSetting.SyncIsPressed)
+					return;
+				
+				// Check player and role
+				if (!Player.TryGet(referenceHub, out Player player) ||
+				    !ExtendedRole.Instances.TryGetValue(player, out ObjectManager manager) ||
+				    !manager.AllowedAbilities.Contains(GetType()))
 				{
 					return;
 				}
+				
+				if (manager.Animator != null)
+				{
+					// If the current animation is not idle, then in progress
+					// I would like the animation of the ability to stop, as otherwise it will be possible to play multiple animations at a time
+					AnimatorStateInfo stateInfo = manager.Animator.GetCurrentAnimatorStateInfo(0);
+					if (!stateInfo.IsName("IdleAnimation"))
+					{
+						return;
+					}
+				}
+				
+				// Check current audio clip
+				// If any sound is being played now, then we skip the ability
+				AudioPlayer audioPlayer = manager.AudioPlayer;
+				if (audioPlayer is not null && audioPlayer.ClipsById.Any())
+					return;
+				
+				// Check cooldown for an ability
+				if (!player.GameObject.TryGetComponent(out CooldownController cooldown))
+					return;
+				
+				if (!cooldown.IsAbilityAvailable(Name))
+					return;
+				
+				// Set a cooldown for an ability
+				cooldown.SetCooldownForAbility(Name, Cooldown);
+				
+				// Activate an ability
+				ActivateAbility(player, manager);
+				Log.Debug($"[Ability] Activating the {Name} ability");
 			}
-			
-			// Check current audio clip
-			// If any sound is being played now, then we skip the ability
-			AudioPlayer audioPlayer = manager.AudioPlayer;
-			if (audioPlayer is not null && audioPlayer.ClipsById.Any())
-				return;
-			
-			// Check cooldown for an ability
-			CooldownController cooldown = player.GameObject.GetComponent<CooldownController>();
-			if (!cooldown.IsAbilityAvailable(Name))
-				return;
-			
-			// Set a cooldown for an ability
-			cooldown.SetCooldownForAbility(Name, Cooldown);
-			
-			// Activate an ability
-			ActivateAbility(player, manager);
-			Log.Debug($"[Ability] Activating the {Name} ability");
+			catch (Exception ex)
+			{
+				Log.Error(ex);
+			}
 		}
 
 		protected abstract void ActivateAbility(Player player, ObjectManager manager);

@@ -10,33 +10,20 @@
 
 	public static class AbilityRegistrator
 	{
-		public static IReadOnlyList<IAbility> GetAbilities => _abilityList;
-
-		private static readonly List<IAbility> _abilityList = [];
-		public static void RegisterAbilities()
+		public static IAbility[] RegisterAbilities(Type[] abilityTypes)
 		{
-			foreach (Type type in Assembly.GetCallingAssembly().GetTypes())
+			List<IAbility> abilities = new();
+			foreach (Type type in abilityTypes)
 			{
-				if (type.IsInterface || type.IsAbstract || !type.GetInterfaces().Contains(typeof(IAbility)))
-					continue;
-
 				if (Activator.CreateInstance(type) is IAbility activator)
 				{
-					_abilityList.Add(activator);
-
-					Log.Debug($"Register the {activator.Name} ability.");
-
+					abilities.Add(activator);
 					activator.Register();
+					Log.Debug($"Register the {activator.Name} ability.");
 				}
 			}
-		}
 
-		public static void UnregisterAbilities()
-		{
-			foreach (IAbility ability in _abilityList)
-			{
-				ability.Unregister();
-			}
+			return abilities.ToArray();
 		}
 	}
 }

@@ -3,9 +3,9 @@
 	using System.Collections.Generic;
 	using System.Linq;
 
-	using Exiled.API.Features;
+	using Configs;
 
-	using Managers;
+	using Exiled.API.Features;
 
 	using UnityEngine;
 
@@ -13,9 +13,9 @@
 	{
 		private Dictionary<string, float> _abilityCooldown;
 		
-		void Awake()
+		public void Init(AbilityConfig abilityConfig)
 		{
-			_abilityCooldown = AbilityRegistrator.GetAbilities.ToDictionary(a => a.Name, _ => 0f);
+			_abilityCooldown = abilityConfig.Abilities.ToDictionary(a => a.Name, _ => 0f);
 			InvokeRepeating(nameof(UpdateCooldown), 0f, 1f);
 			Log.Debug($"[CooldownController] Invoke the cooldown cycle");
 		}
