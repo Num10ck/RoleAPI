@@ -111,6 +111,7 @@
 			ObjectManager manager = new();
 			manager.CreateObjects(player, this);
 			
+			player.SessionVariables["risottoMan.customRoles"] = this.Name;
 			_instances.Add(player, manager);
 		}
 
@@ -122,6 +123,7 @@
 				_instances.Remove(player);
 			}
 			
+			player.SessionVariables.Remove("risottoMan.customRoles");
 			player.CustomName = null;
 			
 			base.RemoveRole(player);
@@ -158,8 +160,6 @@
 
 				if (randomPlayer.SessionVariables.ContainsKey("risottoMan.customRoles"))
 					return;
-				
-				randomPlayer.SessionVariables["risottoMan.customRoles"] = this.Name;
 				
 				Timing.CallDelayed(0.05f, () =>
 				{
