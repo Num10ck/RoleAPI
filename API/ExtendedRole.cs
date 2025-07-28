@@ -34,6 +34,8 @@
 		private static readonly Dictionary<Player, ObjectManager> _instances = [];
 		
 		public abstract string CustomDeathText { get; set; }
+
+		public abstract string CassieDeathAnnouncement { get; set; }
 		
 		public abstract SpawnConfig SpawnConfig { get; set; }
 		
@@ -136,7 +138,7 @@
  
 			string numbers = Regex.Replace(this.Name, "[^0-9]+", string.Empty); // SCP-999 -> 999
 			numbers = string.Join(" ", numbers.ToCharArray()); // 999 -> 9 9 9
-			Cassie.MessageTranslated($"SCP {numbers} contained successfully.", $"{this.Name} contained successfully.");
+			Cassie.MessageTranslated($"SCP {numbers} contained successfully.", this.CassieDeathAnnouncement);
 		}
 		
 		private void OnRoundStarted()
