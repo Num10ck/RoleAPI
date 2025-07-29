@@ -15,7 +15,13 @@
 		
 		public void Init(AbilityConfig abilityConfig)
 		{
-			_abilityCooldown = abilityConfig.Abilities.ToDictionary(a => a.Name, _ => 0f);
+			_abilityCooldown = [];
+
+			foreach (string name in abilityConfig.AbilityTypes)
+			{
+				_abilityCooldown.Add(name, 0);
+			}
+			
 			InvokeRepeating(nameof(UpdateCooldown), 0f, 1f);
 			Log.Debug($"[CooldownController] Invoke the cooldown cycle");
 		}

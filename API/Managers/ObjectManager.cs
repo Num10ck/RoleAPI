@@ -35,7 +35,7 @@ namespace RoleAPI.API.Managers
 
 		public CooldownController CooldownController { get; set; }
 
-		public Type[] AllowedAbilities { get; set; }
+		public string[] AllowedAbilities { get; set; }
 		
 		public void CreateObjects(Player player, ExtendedRole config)
 		{
