@@ -47,6 +47,7 @@
 		
 		public abstract AudioConfig AudioConfig { get; set; }
 
+		[YamlIgnore]
 		public abstract AbilityConfig AbilityConfig { get; set; }
 		
 		public abstract List<EffectConfig> Effects { get; set; }
