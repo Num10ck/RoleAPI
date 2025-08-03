@@ -4,10 +4,13 @@
 
 	using Interfaces;
 
+	using YamlDotNet.Serialization;
+
 	public class AbilityConfig
 	{
-		public Type[] AbilityTypes { get; set; }
+		public string[] AbilityTypes { get; set; }
 
+		[YamlIgnore]
 		public IAbility[] Abilities { get; set; }
 	}
 }
