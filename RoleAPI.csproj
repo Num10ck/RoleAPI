@@ -58,8 +58,18 @@
     <Compile Include="API\Managers\SchematicManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Costura.Fody">
+      <Version>6.0.0</Version>
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="ExMod.Exiled">
-      <Version>9.6.2</Version>
+      <Version>9.7.2</Version>
+    </PackageReference>
+    <PackageReference Include="Fody">
+      <Version>6.9.2</Version>
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +107,9 @@
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>$(SL_REFERENCES)\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
