@@ -10,13 +10,14 @@
 	public static class KeybindManager
 	{
 		private static IEnumerable<SettingBase> _settings;
-		public static void RegisterKeybinds(string pluginName, IAbility[] abilities)
+		public static void RegisterKeybinds(string pluginName, int pluginId, IAbility[] abilities)
 		{
 			List<SettingBase> settings = new();
 			
 			var header = new HeaderSetting(
+				id: pluginId,
 				name: $"Abilities of {pluginName}",
-				paddling: true
+				padding: true
 			);
 			
 			settings.Add(header);

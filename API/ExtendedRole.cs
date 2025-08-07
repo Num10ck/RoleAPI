@@ -59,7 +59,7 @@
 		{
 			// Register abilities and keybinds
 			this.AbilityConfig.Abilities = AbilityRegistrator.RegisterAbilities(AbilityConfig.AbilityTypes);
-			KeybindManager.RegisterKeybinds(this.Name, this.AbilityConfig.Abilities);
+			KeybindManager.RegisterKeybinds(this.Name, (int)this.Id, this.AbilityConfig.Abilities);
 			
 			// Subscribe events
 			base.SubscribeEvents();
