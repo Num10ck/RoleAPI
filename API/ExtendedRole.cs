@@ -87,13 +87,10 @@
 			player.MaxHealth = this.MaxHealth;
 			player.Scale = this.Scale;
 
-			player.CustomName = this.Name;
 			if (this.IsShowPlayerNickname is true)
 			{
-				player.CustomName = $"{this.Name} {player.Nickname}";
+				player.CustomInfo = this.Name;
 			}
-			
-			player.CustomInfo = player.CustomName + "\n" + this.CustomInfo;
 			
 			foreach (EffectConfig effect in this.Effects)
 			{
