@@ -71,11 +71,13 @@
 				if (!cooldown.IsAbilityAvailable(Name))
 					return;
 				
-				// Set a cooldown for an ability
-				cooldown.SetCooldownForAbility(Name, Cooldown);
-				
 				// Activate an ability
-				ActivateAbility(player, manager);
+				if (this.ActivateAbility(player, manager))
+				{
+					// Set a cooldown for an ability
+					cooldown.SetCooldownForAbility(Name, Cooldown);
+				}
+				
 				Log.Debug($"[Ability] Activating the {Name} ability");
 			}
 			catch (Exception ex)
@@ -84,6 +86,6 @@
 			}
 		}
 
-		protected abstract void ActivateAbility(Player player, ObjectManager manager);
+		protected abstract bool ActivateAbility(Player player, ObjectManager manager);
 	}
 }
