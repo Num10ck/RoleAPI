@@ -1,5 +1,6 @@
 ﻿namespace RoleAPI.API
 {
+	using System;
 	using System.Collections.Generic;
 	using System.Text.RegularExpressions;
 
@@ -10,8 +11,6 @@
 	using Exiled.API.Features;
 	using Exiled.CustomRoles.API.Features;
 	using Exiled.Events.EventArgs.Player;
-
-	using LabApi.Events.Arguments.PlayerEvents;
 
 	using Managers;
 
@@ -66,14 +65,12 @@
 			base.SubscribeEvents();
 			Exiled.Events.Handlers.Player.Dying += this.OnDying;
 			Exiled.Events.Handlers.Server.RoundStarted += this.OnRoundStarted;
-			LabApi.Events.Handlers.PlayerEvents.ValidatedVisibility += this.OnPlayerValidatedVisibility;
 		}
 
 		protected override void UnsubscribeEvents()
 		{
 			Exiled.Events.Handlers.Player.Dying -= this.OnDying;
 			Exiled.Events.Handlers.Server.RoundStarted -= this.OnRoundStarted;
-			LabApi.Events.Handlers.PlayerEvents.ValidatedVisibility -= this.OnPlayerValidatedVisibility;
 			base.UnsubscribeEvents();
 		}
 		
@@ -105,6 +102,11 @@
 					intensity: effect.Intensity
 				);
 			}
+
+			if (this.IsPlayerInvisible is true)
+			{
+				player.EnableEffect(EffectType.Fade, 255);
+			}
 			
 			this.ShowBroadcast(player);
 			this.RoleAdded(player);
@@ -126,8 +128,6 @@
 			}
 			
 			player.SessionVariables.Remove("risottoMan.customRoles");
-			player.CustomName = null;
-			
 			base.RemoveRole(player);
 		}
 
@@ -168,17 +168,6 @@
 					this.AddRole(randomPlayer);
 				});
 			}
-		}
-
-		private void OnPlayerValidatedVisibility(PlayerValidatedVisibilityEventArgs ev)
-		{
-			if (this.IsPlayerInvisible is not true)
-				return;
-			
-			if (!this.Check(ev.Target))
-				return;
-			
-			ev.IsVisible = false || ev.Target.CurrentSpectators.Contains(ev.Player);
 		}
 
 		// Unnecessary properties

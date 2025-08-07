@@ -1,9 +1,12 @@
 ﻿namespace RoleAPI.API.Controller
 {
+	using System;
+
 	using Exiled.API.Features;
 
 	using UnityEngine;
 
+	[Obsolete]
 	public class MovementController : MonoBehaviour
 	{
 		private Player _player;

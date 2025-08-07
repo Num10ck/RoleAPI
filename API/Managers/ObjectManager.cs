@@ -2,6 +2,7 @@ namespace RoleAPI.API.Managers
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 
 	using Controller;
 
@@ -84,31 +85,27 @@ namespace RoleAPI.API.Managers
 			}
 			
 			// Get Animator from SchematicObject
-			
 			Animator = SchematicManager.GetAnimatorFromSchematic(SchematicObject);
 			if (Animator is null)
 			{
 				Log.Debug("Failed to get Animator from custom role.");
 			}
 			
-			if (config.IsPlayerInvisible is true)
+			// Attach schematic to the player
+			SchematicObject.transform.position = player.Position + config.SchematicConfig.Offset;
+			SchematicObject.transform.rotation = player.Rotation;
+			SchematicObject.transform.parent = player.Transform;
+			
+			/* todo
+			// Attach schematic to the player camera
+			if (config.SchematicConfig.IsAttachToCamera)
 			{
-				SchematicObject.gameObject.AddComponent<MovementController>().
-					Init(player, config.SchematicConfig.Offset);
-			}
-			else
-			{
-				SchematicObject.transform.position = player.Position + config.SchematicConfig.Offset;
-				
-				if (config.SchematicConfig.IsAttachToCamera)
+				var hitboxes = player.GameObject.GetComponentsInChildren<HitboxIdentity>();
+				foreach (var hitbox in hitboxes)
 				{
-					SchematicObject.transform.parent = player.CameraTransform; //todo
+					SchematicObject.transform.parent = hitbox.transform;
 				}
-				else
-				{
-					SchematicObject.transform.parent = player.Transform;
-				}
-			}
+			}*/
 			
 			// Attach CooldownController to the player
 			CooldownController = player.GameObject.AddComponent<CooldownController>();
